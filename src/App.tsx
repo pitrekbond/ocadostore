@@ -3,9 +3,12 @@ import { CartItem, Product } from "./types";
 import ProductList from "./components/ProductList";
 import ShoppingCart from "./components/ShoppingCart";
 import OrderSummary from "./components/OrderSummary";
+import productsData from "./products.json";
 
 const App: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(
+    productsData as Product[]
+  );
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [currentPage, setCurrentPage] = useState<
     "products" | "cart" | "summary"
@@ -13,9 +16,19 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetch("/products.json")
-      .then((response) => response.json())
-      .then((data) => setProducts(data));
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => setProducts(data))
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+      });
   }, []);
+
+  console.log("gowno");
 
   const handleAddToCart = (product: Product) => {
     setCartItems((prevItems) => {
